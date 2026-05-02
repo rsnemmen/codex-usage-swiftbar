@@ -4,6 +4,8 @@ A SwiftBar / xbar plugin that displays Codex/OpenAI rate-limit utilization in th
 
 It shows the 5-hour and weekly usage windows as either a compact dual progress-bar icon or percentage text, with reset timing in the dropdown when available.
 
+![Codex SwiftBar plugin showing dual usage bars in the macOS menu bar](SCR-20260502-mopl.png)
+
 ## Requirements
 
 - macOS
@@ -87,25 +89,3 @@ Color thresholds for text titles:
 In `auto` mode, the plugin first tries Codex OAuth usage data from the local Codex auth/config files, then falls back to parsing `codex /status` output through the CLI. Parsed usage is cached briefly in `/tmp` to match the SwiftBar refresh interval.
 
 The script uses Bash plus inline `python3` stdlib code for JSON parsing, date math, and dynamic PNG generation. No `jq`, `bc`, or third-party Python packages are required.
-
-`icon.png` is the source icon asset. Its PNG data is embedded in `codex_usage.5m.sh` as base64 for SwiftBar `templateImage` output, matching the pattern used by the sibling Claude plugin.
-
-## Development
-
-Run these checks before committing changes:
-
-```bash
-bash -n codex_usage.5m.sh
-bash codex_usage.5m.sh
-VAR_SOURCE=oauth bash codex_usage.5m.sh
-VAR_SOURCE=cli bash codex_usage.5m.sh
-VAR_SHOW_BARS=false bash codex_usage.5m.sh
-```
-
-Optional lint:
-
-```bash
-shellcheck codex_usage.5m.sh
-```
-
-Do not commit tokens, `auth.json`, or cached files from `/tmp`.
