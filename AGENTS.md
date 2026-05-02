@@ -4,6 +4,7 @@
 This repository unit is a single SwiftBar/xbar plugin:
 
 - `codex_usage.5m.sh`: main script (menu output, OAuth/CLI fetching, parsing, rendering)
+- `icon.png`: source icon asset; embedded into the script as base64 for SwiftBar `templateImage` output
 
 It lives inside a larger parent folder with sibling plugins (`../claude_code`, `../poe_balance`, etc.), but changes here should stay scoped to `codex/` unless explicitly requested.
 
@@ -26,6 +27,7 @@ For SwiftBar, install by placing `codex_usage.5m.sh` in your plugins directory; 
   - `VAR_*` for user-configurable xbar vars
   - `PCT_*`, `RESET_*`, `COLOR_*`, `BAR_*` for computed display data
 - Preserve SwiftBar output protocol: first line is menu title, `---` separates dropdown sections.
+- Keep `OPENAI_ICON` as embedded base64 generated from `icon.png`, following the pattern in `../claude_code/claude_code.5m.sh`.
 
 ## Testing Guidelines
 Automated tests are not configured. Validate manually before merging:
@@ -36,6 +38,7 @@ Automated tests are not configured. Validate manually before merging:
 4. Verify key modes using env overrides, for example:
    - `VAR_SOURCE=oauth bash codex_usage.5m.sh`
    - `VAR_SOURCE=cli bash codex_usage.5m.sh`
+   - `VAR_SHOW_BARS=false bash codex_usage.5m.sh`
 
 ## Commit & Pull Request Guidelines
 Recent history favors short imperative commit subjects (e.g., “Add Codex SwiftBar usage plugin…”). Follow:
