@@ -4,7 +4,7 @@ A SwiftBar / xbar plugin that displays Codex/OpenAI rate-limit utilization in th
 
 It shows the 5-hour and weekly usage windows as either a compact dual progress-bar icon or percentage text, with reset timing in the dropdown when available.
 
-![Codex SwiftBar plugin showing dual usage bars in the macOS menu bar](SCR-20260502-mopl.png)
+<img src="SCR-20260502-mopl.png" alt="Codex SwiftBar plugin showing dual usage bars in the macOS menu bar" width="400">
 
 ## Requirements
 
