@@ -89,3 +89,13 @@ Color thresholds for text titles:
 In `auto` mode, the plugin first tries Codex OAuth usage data from the local Codex auth/config files, then falls back to parsing `codex /status` output through the CLI. Parsed usage is cached briefly in `/tmp` to match the SwiftBar refresh interval.
 
 The script uses Bash plus inline `python3` stdlib code for JSON parsing, date math, and dynamic PNG generation. No `jq`, `bc`, or third-party Python packages are required.
+
+## More SwiftBar plugins by the author
+
+Small, glanceable menu bar utilities that stay out of the way until you need them:
+
+- **[codex_usage](https://github.com/rsnemmen/codex-usage-swiftbar)** — Codex/OpenAI usage limits (5h, 7d windows) at a glance.
+- **[claude_code](https://github.com/rsnemmen/claude-code-xbar)** — Claude Code usage limits (5h, 7d windows) at a glance.
+- **[copilot-usage-tracker](https://github.com/rsnemmen/copilot-usage-tracker)** — GitHub Copilot premium request usage and monthly pacing.
+- **[poe_balance](https://github.com/rsnemmen/poe-balance-xbar)** — Poe API balance, percentage, and spending pace vs. the billing cycle.
+- **[weather](https://github.com/rsnemmen/weather-bar)** — Current conditions, temperature, humidity, and wind — no API key required.
