@@ -19,36 +19,7 @@ SHOW_BARS="${VAR_SHOW_BARS:-true}"
 SHOW_PACE="${VAR_SHOW_PACE:-false}"
 SOURCE_MODE="${VAR_SOURCE:-auto}"
 
-SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
-ICON_SVG="${SCRIPT_DIR}/icon.svg"
-
-# Valid 18x18 template PNG fallback. SwiftBar needs valid image data; if this is
-# empty or corrupt, image-only title mode can render as an invisible menu item.
-FALLBACK_ICON="iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAANklEQVR4nGNgGCrgPwFMFUOIMoyQYqIMI9npdDMIl+EkB/IwNmjwxBq6YWQnSFyKaZrfhgAAAEtEV6k2CMCHAAAAAElFTkSuQmCC"
-
-load_icon() {
-  [ -f "$ICON_SVG" ] || {
-    printf '%s\n' "$FALLBACK_ICON"
-    return
-  }
-  python3 - "$ICON_SVG" "$FALLBACK_ICON" <<'PY'
-import base64
-import pathlib
-import sys
-
-path = pathlib.Path(sys.argv[1])
-fallback = sys.argv[2]
-try:
-    data = path.read_bytes()
-except Exception:
-    print(fallback)
-    raise SystemExit(0)
-
-print(base64.b64encode(data).decode("ascii") if data else fallback)
-PY
-}
-
-OPENAI_ICON="$(load_icon)"
+OPENAI_ICON="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"
 
 USAGE_CACHE="/tmp/.codex_swiftbar_cache"
 TOKEN_CACHE="/tmp/.codex_swiftbar_token"
@@ -430,12 +401,12 @@ PY
 
 make_icon() {
   local pct5="${1:-0}" pct7="${2:-0}"
-  python_eval "$pct5" "$pct7" <<'PY'
+  python_eval "$pct5" "$pct7" "$OPENAI_ICON" <<'PY'
 import base64, struct, zlib, sys
 p5 = max(0, min(100, int(round(float(sys.argv[1])))))
 p7 = max(0, min(100, int(round(float(sys.argv[2])))))
 W,H=52,18; LOGO_W,LOGO_H=18,18; BAR_X,BAR_W=20,32
-logo_b64="iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAANklEQVR4nGNgGCrgPwFMFUOIMoyQYqIMI9npdDMIl+EkB/IwNmjwxBq6YWQnSFyKaZrfhgAAAEtEV6k2CMCHAAAAAElFTkSuQmCC"
+logo_b64=sys.argv[3]
 def dp(b):
     d=base64.b64decode(b); pos=8; idat=[]; w=h=0
     while pos<len(d):
