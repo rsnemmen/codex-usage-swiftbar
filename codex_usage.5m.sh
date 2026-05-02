@@ -19,8 +19,36 @@ SHOW_BARS="${VAR_SHOW_BARS:-true}"
 SHOW_PACE="${VAR_SHOW_PACE:-false}"
 SOURCE_MODE="${VAR_SOURCE:-auto}"
 
-# Replace this with an official OpenAI logo base64 if you want a different glyph.
-OPENAI_ICON="iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAANhJREFUOE/tk7ENwjAQRN9+Q0foAq0jVYAm6QhdoQtoAa2hHZA9QEdgA5NQ0LqJYyfxkNxk5fT9+8fYQZI2Qv7YAz3wR7gBR8Djcq8s9M2W4Bf4U7w7G1Wk5l3gLej2bA0aJk5xX4g0uQ+Qq8x2mF8vY2g0n0mXJ1N6hYB2xrhfXKq9v4gJ3s8HkXyZ6i9V2f8Q8oA3vG2xjY8Gq6k2k8N9q6h7k6p8Wm2eJcO8fM8xYJH1Qq8yW2hN2xG4E9m8hDqD1Jz2V0U3oH9s9n9g8RrQkWv1fQAAAABJRU5ErkJggg=="
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd -P)"
+ICON_SVG="${SCRIPT_DIR}/icon.svg"
+
+# Valid 18x18 template PNG fallback. SwiftBar needs valid image data; if this is
+# empty or corrupt, image-only title mode can render as an invisible menu item.
+FALLBACK_ICON="iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAANklEQVR4nGNgGCrgPwFMFUOIMoyQYqIMI9npdDMIl+EkB/IwNmjwxBq6YWQnSFyKaZrfhgAAAEtEV6k2CMCHAAAAAElFTkSuQmCC"
+
+load_icon() {
+  [ -f "$ICON_SVG" ] || {
+    printf '%s\n' "$FALLBACK_ICON"
+    return
+  }
+  python3 - "$ICON_SVG" "$FALLBACK_ICON" <<'PY'
+import base64
+import pathlib
+import sys
+
+path = pathlib.Path(sys.argv[1])
+fallback = sys.argv[2]
+try:
+    data = path.read_bytes()
+except Exception:
+    print(fallback)
+    raise SystemExit(0)
+
+print(base64.b64encode(data).decode("ascii") if data else fallback)
+PY
+}
+
+OPENAI_ICON="$(load_icon)"
 
 USAGE_CACHE="/tmp/.codex_swiftbar_cache"
 TOKEN_CACHE="/tmp/.codex_swiftbar_token"
@@ -407,7 +435,7 @@ import base64, struct, zlib, sys
 p5 = max(0, min(100, int(round(float(sys.argv[1])))))
 p7 = max(0, min(100, int(round(float(sys.argv[2])))))
 W,H=52,18; LOGO_W,LOGO_H=18,18; BAR_X,BAR_W=20,32
-logo_b64="iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAAAXNSR0IArs4c6QAAANhJREFUOE/tk7ENwjAQRN9+Q0foAq0jVYAm6QhdoQtoAa2hHZA9QEdgA5NQ0LqJYyfxkNxk5fT9+8fYQZI2Qv7YAz3wR7gBR8Djcq8s9M2W4Bf4U7w7G1Wk5l3gLej2bA0aJk5xX4g0uQ+Qq8x2mF8vY2g0n0mXJ1N6hYB2xrhfXKq9v4gJ3s8HkXyZ6i9V2f8Q8oA3vG2xjY8Gq6k2k8N9q6h7k6p8Wm2eJcO8fM8xYJH1Qq8yW2hN2xG4E9m8hDqD1Jz2V0U3oH9s9n9g8RrQkWv1fQAAAABJRU5ErkJggg=="
+logo_b64="iVBORw0KGgoAAAANSUhEUgAAABIAAAASCAYAAABWzo5XAAAANklEQVR4nGNgGCrgPwFMFUOIMoyQYqIMI9npdDMIl+EkB/IwNmjwxBq6YWQnSFyKaZrfhgAAAEtEV6k2CMCHAAAAAElFTkSuQmCC"
 def dp(b):
     d=base64.b64decode(b); pos=8; idat=[]; w=h=0
     while pos<len(d):
@@ -517,8 +545,14 @@ else
 fi
 
 if [ "$SHOW_BARS" = "true" ]; then
-  BAR_ICON="$(make_icon "$PCT_5H" "$PCT_7D")"
-  echo " | templateImage=${BAR_ICON}"
+  BAR_ICON="$(make_icon "$PCT_5H" "$PCT_7D" 2>/dev/null)"
+  if [ -n "$BAR_ICON" ]; then
+    echo " | templateImage=${BAR_ICON}"
+  elif [ -n "$TITLE_COLOR" ]; then
+    echo "${TITLE} | templateImage=${OPENAI_ICON} color=${TITLE_COLOR}"
+  else
+    echo "${TITLE} | templateImage=${OPENAI_ICON}"
+  fi
 else
   if [ -n "$TITLE_COLOR" ]; then
     echo "${TITLE} | templateImage=${OPENAI_ICON} color=${TITLE_COLOR}"
